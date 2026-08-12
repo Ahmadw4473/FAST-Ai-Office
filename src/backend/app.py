@@ -17,6 +17,13 @@ async def startup_event():
 
     print("RAG system ready!")
 
+@app.get("/")
+def root():
+    return {
+        "status": "online",
+        "message": "University RAG API is running"
+    }
+
 
 @app.post("/query")
 def getResponse(query: str):
