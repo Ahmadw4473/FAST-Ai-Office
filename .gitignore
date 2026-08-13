@@ -44,3 +44,25 @@ next-env.d.ts
 src/backend/venv/
 __pycache__/
 *.pyc
+
+# Python virtual environments
+venv/
+venv_jina/
+venv_render/
+
+# Environment variables
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Old Chroma database
+chroma_db/
+chromadb/
+
+# IDE
+.vscode/
+
+# Node
+node_modules/

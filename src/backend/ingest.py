@@ -1,45 +1,58 @@
+import os
 from pathlib import Path
 
+from dotenv import load_dotenv
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import Docx2txtLoader
 from langchain_community.vectorstores import Chroma
-from langchain_huggingface import HuggingFaceEmbeddings
+
+from jina_embeddings import JinaEmbeddings
+
+load_dotenv()
 
 
 def main():
 
+    # ==========================================
+    # 1. Documents folder
+    # ==========================================
+
     documents_folder = Path("documents")
 
-    # Find Word files
-    word_files = list(documents_folder.glob("*.docx"))
+    docx_files = list(documents_folder.glob("*.docx"))
 
-    print(f"Found {len(word_files)} Word files")
+    print(f"Found {len(docx_files)} Word files")
 
-    if not word_files:
-        print("No .docx files found in the documents folder.")
+    if not docx_files:
+        print("No .docx files found.")
         return
+
+    # ==========================================
+    # 2. Load documents
+    # ==========================================
 
     all_documents = []
 
-    # Load every Word file
-    for word_file in word_files:
+    for docx_file in docx_files:
 
-        print(f"\nLoading: {word_file.name}")
+        print(f"\nLoading: {docx_file.name}")
 
-        loader = Docx2txtLoader(str(word_file))
+        loader = Docx2txtLoader(str(docx_file))
         documents = loader.load()
 
-        # Add source metadata
         for document in documents:
-            document.metadata["source"] = word_file.name
+            document.metadata["source"] = docx_file.name
 
-        print(f"  Documents loaded: {len(documents)}")
+        print("  Loaded successfully")
 
         all_documents.extend(documents)
 
     print(f"\nTotal documents loaded: {len(all_documents)}")
 
-    # Split documents into chunks
+    # ==========================================
+    # 3. Split into chunks
+    # ==========================================
+
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=2000,
         chunk_overlap=200
@@ -49,42 +62,31 @@ def main():
 
     print(f"Total chunks created: {len(docs)}")
 
-    # Embeddings
-    print("\nLoading embedding model...")
+    # ==========================================
+    # 4. Jina embeddings
+    # ==========================================
 
-    embeddings = HuggingFaceEmbeddings(
-        model_name="sentence-transformers/all-MiniLM-L6-v2"
+    print("\nConnecting to Jina...")
+
+    embeddings = JinaEmbeddings(
+        model="jina-embeddings-v5-text-small"
     )
 
-    # Create Chroma database
-    print("\nCreating Chroma database...")
+    # ==========================================
+    # 5. Create NEW Chroma database
+    # ==========================================
+
+    print("\nCreating Jina Chroma database...")
 
     vectorstore = Chroma.from_documents(
         documents=docs,
         embedding=embeddings,
-        persist_directory="chromadb"
+        persist_directory="chromadb_jina"
     )
 
-    # Verify database
-    data = vectorstore.get()
-
-    sources = set()
-
-    for metadata in data["metadatas"]:
-        if metadata:
-            sources.add(metadata.get("source", "UNKNOWN"))
-
     print("\n===================================")
-    print("INGESTION COMPLETE")
+    print("Jina vector database created!")
     print("===================================")
-
-    print("Total chunks in Chroma:", len(data["documents"]))
-    print("Unique Word files in Chroma:", len(sources))
-
-    print("\nFiles stored in Chroma:")
-
-    for source in sorted(sources):
-        print("-", source)
 
 
 if __name__ == "__main__":
