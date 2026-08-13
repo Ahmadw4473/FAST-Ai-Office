@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 from dotenv import load_dotenv
 from langchain_community.vectorstores import Chroma
@@ -8,6 +9,9 @@ from langchain_core.prompts import ChatPromptTemplate
 from jina_embeddings import JinaEmbeddings
 
 load_dotenv()
+
+BASE_DIR = Path(__file__).resolve().parent
+CHROMA_DIR = BASE_DIR / "chromadb_jina"
 
 
 def loader():
@@ -25,7 +29,7 @@ def loader():
     # ==========================================
 
     vectorstore = Chroma(
-        persist_directory="chromadb_jina",
+        persist_directory=str(CHROMA_DIR),
         embedding_function=embeddings
     )
 

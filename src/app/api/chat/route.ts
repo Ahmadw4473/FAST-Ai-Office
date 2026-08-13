@@ -8,7 +8,7 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json()
-  const response = await fetch(new URL('/query', apiUrl), {
+  const response = await fetch(new URL('/query', apiUrl).toString(), {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -16,11 +16,29 @@ export async function POST(request: Request) {
     body: JSON.stringify(body),
   })
 
-  const data = await response.json()
+  const text = await response.text()
+  const data = parseJson(text)
 
   if (!response.ok) {
-    return NextResponse.json(data, { status: response.status })
+    return NextResponse.json(
+      {
+        error:
+          data?.error ||
+          data?.detail ||
+          text ||
+          `Backend request failed with status ${response.status}.`,
+      },
+      { status: response.status },
+    )
   }
 
-  return NextResponse.json({ answer: data.answer })
+  return NextResponse.json({ answer: data?.answer ?? text })
+}
+
+function parseJson(text: string): Record<string, string> | null {
+  try {
+    return JSON.parse(text)
+  } catch {
+    return null
+  }
 }

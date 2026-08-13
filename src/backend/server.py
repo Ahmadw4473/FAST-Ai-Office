@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from rag import loader, ask_rag
 from pydantic import BaseModel
 
@@ -31,9 +31,17 @@ def root():
 
 @app.post("/query")
 def getResponse(request: QueryRequest):
+    if retriever is None or llm is None:
+        raise HTTPException(
+            status_code=503,
+            detail="RAG system is not ready. Check backend startup logs."
+        )
 
-    return {"answer": ask_rag(
-        query=request.query,
-        retriever=retriever,
-        llm=llm
-    )}
+    try:
+        return {"answer": ask_rag(
+            query=request.query,
+            retriever=retriever,
+            llm=llm
+        )}
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc

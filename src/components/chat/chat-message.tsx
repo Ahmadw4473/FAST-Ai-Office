@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { Sparkles, ThumbsUp, ThumbsDown } from 'lucide-react'
-import { SourceCard } from '@/components/source-card'
 import { ActionCard } from '@/components/chat/action-card'
 import { cn } from '@/lib/utils'
 import type { Source } from '@/lib/fast-data'
@@ -39,8 +38,6 @@ export function ChatMessage({ message }: { message: ChatMessageData }) {
           {/* <span className="text-xs font-semibold text-primary">AI Answer</span> */}
           <p className="text-sm leading-relaxed text-foreground text-pretty">{message.content}</p>
         </div>
-
-        {message.source && <SourceCard source={message.source} />}
 
         {message.action && (
           <ActionCard title={message.action.title} actionLabel={message.action.actionLabel} />
