@@ -2,11 +2,10 @@
 
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
-import { Menu, X, ShieldCheck, Home, MessageSquare, Bookmark, User } from 'lucide-react'
+import { X, Home, MessageSquare, Bookmark, User } from 'lucide-react'
 import { ChatSidebar } from '@/components/chat/chat-sidebar'
 import { ChatMessage, type ChatMessageData } from '@/components/chat/chat-message'
 import { ChatInput } from '@/components/chat/chat-input'
-import { SponsoredAd } from '@/components/sponsored-ad'
 import { categories } from '@/lib/fast-data'
 import { cn } from '@/lib/utils'
 
@@ -33,13 +32,31 @@ const seededConversation: ChatMessageData[] = [
     },
   },
 ]
+async function fetchChatResponse(userMessage: string) {
+  const response = await fetch('/api/chat', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      query: userMessage,
+    }),
+  })
 
-function buildAssistantReply(question: string): ChatMessageData {
+  if (!response.ok) {
+    throw new Error('Unable to get a response right now.')
+  }
+
+  const data = await response.json()
+  return data.answer
+}
+
+async function buildAssistantReply(question: string): Promise<ChatMessageData> {
+  const response = await fetchChatResponse(question)
   return {
     id: `a-${Date.now()}`,
     role: 'assistant',
-    content:
-      'Based on official FAST-NUCES documents, here is what applies to your question. Always confirm exact dates for the current semester on the student portal, as deadlines are updated each term.',
+    content: response,
     source: {
       document: 'Undergraduate Academic Rules & Regulations',
       edition: 'June 2026',
@@ -60,12 +77,28 @@ export default function ChatPage() {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
   }, [messages])
 
-  function handleSend(value: string) {
-    const userMsg: ChatMessageData = { id: `u-${Date.now()}`, role: 'user', content: value }
+  async function handleSend(value: string) {
+    const userMsg: ChatMessageData = {
+      id: `u-${Date.now()}`,
+      role: 'user',
+      content: value,
+    }
+
     setMessages((prev) => [...prev, userMsg])
-    setTimeout(() => {
-      setMessages((prev) => [...prev, buildAssistantReply(value)])
-    }, 400)
+
+    try {
+      const assistantReply = await buildAssistantReply(value)
+      setMessages((prev) => [...prev, assistantReply])
+    } catch {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `a-${Date.now()}`,
+          role: 'assistant',
+          content: 'I could not reach the FAST AI Office service right now. Please try again.',
+        },
+      ])
+    }
   }
 
   function handleNewChat() {
@@ -175,7 +208,7 @@ export default function ChatPage() {
                 {messages.map((m) => (
                   <ChatMessage key={m.id} message={m} />
                 ))}
-                <SponsoredAd className="max-w-sm" />
+                {/* <SponsoredAd className="max-w-sm" /> */}
               </div>
             )}
           </div>
