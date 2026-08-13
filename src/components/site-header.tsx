@@ -23,18 +23,6 @@ export function SiteHeader() {
           <FastLogo />
         </Link>
 
-        {/* <nav className="hidden items-center gap-1 md:flex" aria-label="Primary">
-          {navLinks.map((link) => (
-            <Link
-              key={link.label}
-              href={link.href}
-              className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav> */}
-
         <div className="hidden items-center gap-2 md:flex">
           <Button variant="ghost" size="lg" nativeButton={false} render={<Link href="/login" />}>
             Sign in

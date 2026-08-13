@@ -9,29 +9,7 @@ import { ChatInput } from '@/components/chat/chat-input'
 import { categories } from '@/lib/fast-data'
 import { cn } from '@/lib/utils'
 
-const seededConversation: ChatMessageData[] = [
-  {
-    id: 's1',
-    role: 'user',
-    content: 'Can I withdraw from CS301 after midterms?',
-  },
-  {
-    id: 's2',
-    role: 'assistant',
-    content:
-      'According to FAST-NUCES academic regulations, course withdrawal is subject to the university\u2019s specified withdrawal deadline and applicable approval requirements. Withdrawing from CS301 after midterms is possible provided you are still within the withdrawal window and obtain the required approvals.',
-    source: {
-      document: 'Undergraduate Academic Rules & Regulations',
-      edition: 'June 2026',
-      section: 'Section 4.2',
-      page: 'Page 37',
-    },
-    action: {
-      title: 'Need to start the withdrawal process?',
-      actionLabel: 'Open Withdrawal Form',
-    },
-  },
-]
+
 async function fetchChatResponse(userMessage: string) {
   const response = await fetch('/api/chat', {
     method: 'POST',
@@ -44,7 +22,8 @@ async function fetchChatResponse(userMessage: string) {
   })
 
   if (!response.ok) {
-    throw new Error('Unable to get a response right now.')
+    const errorData = await response.json().catch(() => null)
+    throw new Error(errorData?.error || 'Unable to get a response right now.')
   }
 
   const data = await response.json()
@@ -67,7 +46,7 @@ async function buildAssistantReply(question: string): Promise<ChatMessageData> {
 }
 
 export default function ChatPage() {
-  const [messages, setMessages] = useState<ChatMessageData[]>(seededConversation)
+  const [messages, setMessages] = useState<ChatMessageData[]>([])
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
 
@@ -89,13 +68,16 @@ export default function ChatPage() {
     try {
       const assistantReply = await buildAssistantReply(value)
       setMessages((prev) => [...prev, assistantReply])
-    } catch {
+    } catch (error) {
       setMessages((prev) => [
         ...prev,
         {
           id: `a-${Date.now()}`,
           role: 'assistant',
-          content: 'I could not reach the FAST AI Office service right now. Please try again.',
+          content:
+            error instanceof Error
+              ? error.message
+              : 'I could not reach the FAST AI Office service right now. Please try again.',
         },
       ])
     }
@@ -117,7 +99,7 @@ export default function ChatPage() {
     <div className="flex h-dvh overflow-hidden bg-background">
       {/* Desktop sidebar */}
       <aside className="hidden w-72 shrink-0 border-r border-sidebar-border md:block">
-        <ChatSidebar onNewChat={handleNewChat} onSelect={() => setMessages(seededConversation)} />
+        <ChatSidebar onNewChat={handleNewChat}  />
       </aside>
 
       {/* Mobile sidebar drawer */}
@@ -150,26 +132,7 @@ export default function ChatPage() {
 
       {/* Main column */}
       <div className="flex min-w-0 flex-1 flex-col">
-        {/* Top bar */}
-        {/* <header className="flex h-14 shrink-0 items-center gap-3 border-b border-border px-4">
-          <button
-            type="button"
-            onClick={() => setSidebarOpen(true)}
-            aria-label="Open menu"
-            className="inline-flex size-9 items-center justify-center rounded-md text-foreground md:hidden"
-          >
-            <Menu className="size-5" />
-          </button>
-          <div className="flex flex-col leading-none">
-            <span className="text-sm font-semibold text-foreground">AI Office</span>
-            <span className="mt-0.5 text-[11px] text-muted-foreground">FAST-NUCES</span>
-          </div>
-          <span className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-success/30 bg-success/10 px-2.5 py-1 text-[11px] font-medium text-success">
-            <ShieldCheck className="size-3" />
-            Verified
-          </span>
-        </header> */}
-
+       
         {/* Body */}
         <div ref={scrollRef} className="flex-1 overflow-y-auto">
           <div className="mx-auto w-full max-w-3xl px-4 py-6 sm:px-6">

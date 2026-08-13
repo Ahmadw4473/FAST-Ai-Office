@@ -20,6 +20,12 @@ export async function POST(request: Request) {
   const data = parseJson(text)
 
   if (!response.ok) {
+    console.error('FAST backend request failed', {
+      url: new URL('/query', apiUrl).toString(),
+      status: response.status,
+      body: text,
+    })
+
     return NextResponse.json(
       {
         error:

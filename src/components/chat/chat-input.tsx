@@ -34,7 +34,7 @@ export function ChatInput({ onSend }: ChatInputProps) {
         aria-label="Attach a file"
         className="flex size-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
       >
-        <Paperclip className="size-4.5" />
+        {/* <Paperclip className="size-4.5" /> */}
       </button>
       <textarea
         ref={ref}

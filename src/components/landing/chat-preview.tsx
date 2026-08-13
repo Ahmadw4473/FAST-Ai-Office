@@ -34,14 +34,14 @@ export function ChatPreview() {
               subject to approval. After midterms it is still possible within the withdrawal window
               defined in the academic regulations.
             </p>
-            <SourceCard
+            {/* <SourceCard
               source={{
                 document: 'Undergraduate Academic Rules & Regulations',
                 edition: 'June 2026',
                 section: 'Section 4.2',
                 page: 'Page 37',
               }}
-            />
+            /> */}
           </div>
         </div>
       </div>

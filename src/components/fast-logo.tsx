@@ -15,22 +15,22 @@ interface FastLogoProps {
 export function FastLogo({ className, onDark = false, showDescriptor = true }: FastLogoProps) {
   return (
     <span className={cn('inline-flex items-center gap-2.5', className)}>
-      <span
+      {/* <span
         aria-hidden="true"
         className="flex size-8 items-center justify-center rounded-md bg-primary font-mono text-[13px] font-bold tracking-tight text-primary-foreground"
       >
         F
-      </span>
+      </span> */}
       <span className="flex flex-col leading-none">
         <span
           className={cn(
-            'text-[15px] font-bold tracking-tight',
+            'text-[25px] font-bold tracking-tight',
             onDark ? 'text-white' : 'text-foreground',
           )}
         >
           FAST <span className="text-primary">AI</span> Office
         </span>
-        {showDescriptor && (
+        {/* {showDescriptor && (
           <span
             className={cn(
               'mt-0.5 text-[10px] font-medium tracking-wide uppercase',
@@ -39,7 +39,7 @@ export function FastLogo({ className, onDark = false, showDescriptor = true }: F
           >
             FAST-NUCES Assistant
           </span>
-        )}
+        )} */}
       </span>
     </span>
   )

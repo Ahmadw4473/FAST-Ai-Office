@@ -54,7 +54,7 @@
   color-scheme: light;
 
   /* Backgrounds — predominantly white / very light neutral */
-  --background: oklch(1 0 0);
+  --background: oklch(96.416% 0.00011 271.152);
   --foreground: oklch(0.18 0.004 285);
 
   --card: oklch(1 0 0);

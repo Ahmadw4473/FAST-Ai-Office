@@ -17,7 +17,7 @@ export default function Page() {
         {/* <Sources /> */}
         {/* <Flow /> */}
       </main>
-      {/* <Footer /> */}
+      <Footer />
     </div>
   )
 }
