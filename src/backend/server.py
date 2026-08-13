@@ -1,10 +1,14 @@
 from fastapi import FastAPI
 from rag import loader, ask_rag
+from pydantic import BaseModel
 
 app = FastAPI()
 
 retriever = None
 llm = None
+
+class QueryRequest(BaseModel):
+    query: str
 
 
 @app.on_event("startup")
@@ -26,10 +30,10 @@ def root():
 
 
 @app.post("/query")
-def getResponse(query: str):
+def getResponse(request: QueryRequest):
 
-    return ask_rag(
-        query,
-        retriever,
-        llm
-    )
+    return {"answer": ask_rag(
+        query=request.query,
+        retriever=retriever,
+        llm=llm
+    )}
