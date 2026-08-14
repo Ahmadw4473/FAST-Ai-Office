@@ -13,10 +13,6 @@ load_dotenv()
 
 def main():
 
-    # ==========================================
-    # 1. Documents folder
-    # ==========================================
-
     documents_folder = Path("documents")
 
     docx_files = list(documents_folder.glob("*.docx"))
@@ -27,9 +23,7 @@ def main():
         print("No .docx files found.")
         return
 
-    # ==========================================
-    # 2. Load documents
-    # ==========================================
+
 
     all_documents = []
 
@@ -49,9 +43,7 @@ def main():
 
     print(f"\nTotal documents loaded: {len(all_documents)}")
 
-    # ==========================================
-    # 3. Split into chunks
-    # ==========================================
+   
 
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=2000,
@@ -62,19 +54,14 @@ def main():
 
     print(f"Total chunks created: {len(docs)}")
 
-    # ==========================================
-    # 4. Jina embeddings
-    # ==========================================
-
+ 
     print("\nConnecting to Jina...")
 
     embeddings = JinaEmbeddings(
         model="jina-embeddings-v5-text-small"
     )
 
-    # ==========================================
-    # 5. Create NEW Chroma database
-    # ==========================================
+ 
 
     print("\nCreating Jina Chroma database...")
 

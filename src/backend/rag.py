@@ -16,26 +16,17 @@ CHROMA_DIR = BASE_DIR / "chromadb_jina"
 
 def loader():
 
-    # ==========================================
-    # 1. Jina Embeddings
-    # ==========================================
 
     embeddings = JinaEmbeddings(
         model="jina-embeddings-v5-text-small"
     )
 
-    # ==========================================
-    # 2. Load Jina Chroma database
-    # ==========================================
 
     vectorstore = Chroma(
         persist_directory=str(CHROMA_DIR),
         embedding_function=embeddings
     )
 
-    # ==========================================
-    # 3. Retriever
-    # ==========================================
 
     retriever = vectorstore.as_retriever(
         search_type="mmr",
@@ -46,9 +37,7 @@ def loader():
         }
     )
 
-    # ==========================================
-    # 4. Groq
-    # ==========================================
+  
 
     llm = ChatGroq(
         model="llama-3.3-70b-versatile",
@@ -61,16 +50,10 @@ def loader():
 
 def ask_rag(query, retriever, llm):
 
-    # ==========================================
-    # 5. Retrieve relevant documents
-    # ==========================================
-
+ 
     retrieved_docs = retriever.invoke(query)
 
-    # ==========================================
-    # 6. Build context
-    # ==========================================
-
+ 
     context = ""
 
     for i, doc in enumerate(retrieved_docs, 1):
@@ -89,9 +72,6 @@ SOURCE: {source}
 --------------------------------
 """
 
-    # ==========================================
-    # 7. RAG prompt
-    # ==========================================
 
     prompt = ChatPromptTemplate.from_template(
         """
@@ -151,10 +131,6 @@ Now understand the documents and answer the
 user's question.
 """
     )
-
-    # ==========================================
-    # 8. Ask Groq
-    # ==========================================
 
     messages = prompt.format_messages(
         context=context,
