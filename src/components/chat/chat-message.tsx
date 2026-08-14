@@ -1,5 +1,5 @@
 import type { Source } from '@/lib/fast-data'
-
+import ReactMarkdown from 'react-markdown';
 export interface ChatMessageData {
   id: string
   role: 'user' | 'assistant'
@@ -21,51 +21,46 @@ export function ChatMessage({ message }: { message: ChatMessageData }) {
 
   return (
     <div className="flex gap-3">
-      {/* <span className="mt-1 flex size-8 shrink-0 items-center justify-center rounded-md bg-primary/10">
-        <Sparkles className="size-4 text-primary" />
-      </span> */}
+
       <div className="min-w-0 flex-1 space-y-4">
-        {/* AI answer */}
         <div className="space-y-1">
-          {/* <span className="text-xs font-semibold text-primary">AI Answer</span> */}
-          <FormattedMessage content={message.content} />
-        </div>
+          <ReactMarkdown
+            components={{
+              strong: ({ children }) => (
+                <strong className="font-bold">
+                  {children}
+                </strong>
+              ),
 
-        {/* {message.action && (
-          <ActionCard title={message.action.title} actionLabel={message.action.actionLabel} />
-        )} */}
-      </div>
-    </div>
-  )
-}
+              ul: ({ children }) => (
+                <ul className="list-disc ml-6 my-3">
+                  {children}
+                </ul>
+              ),
 
-function FormattedMessage({ content }: { content: string }) {
-  const blocks = content.replace(/\\n/g, '\n').split(/\n{2,}/)
+              ol: ({ children }) => (
+                <ol className="list-decimal ml-6 my-3">
+                  {children}
+                </ol>
+              ),
 
-  return (
-    <div className="space-y-3 text-sm leading-relaxed text-foreground">
-      {blocks.map((block, index) => {
-        const lines = block.split('\n').filter(Boolean)
-        const isList = lines.every((line) => line.trim().startsWith('* '))
-
-        if (isList) {
-          return (
-            <ul key={index} className="ml-5 list-disc space-y-1">
-              {lines.map((line, lineIndex) => (
-                <li key={lineIndex} className="pl-1">
-                  {line.trim().replace(/^\* /, '')}
+              li: ({ children }) => (
+                <li className="mb-1">
+                  {children}
                 </li>
-              ))}
-            </ul>
-          )
-        }
+              ),
 
-        return (
-          <p key={index} className="text-pretty">
-            {lines.join(' ')}
-          </p>
-        )
-      })}
+              p: ({ children }) => (
+                <p className="mb-3">
+                  {children}
+                </p>
+              ),
+            }}
+          >
+            {message.content}
+          </ReactMarkdown>
+        </div>
+      </div>
     </div>
   )
 }
