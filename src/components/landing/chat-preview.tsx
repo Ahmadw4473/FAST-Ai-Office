@@ -6,9 +6,9 @@ export function ChatPreview() {
     <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
       {/* window bar */}
       <div className="flex items-center gap-2 border-b border-border bg-muted/40 px-4 py-3">
-        <span className="flex size-6 items-center justify-center rounded-md bg-primary">
+        {/* <span className="flex size-6 items-center justify-center rounded-md bg-primary">
           <Sparkles className="size-3.5 text-primary-foreground" />
-        </span>
+        </span> */}
         <span className="text-sm font-semibold text-foreground">Fast AI Office</span>
         {/* <span className="ml-auto rounded-full bg-background px-2 py-0.5 font-mono text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
           FAST-NUCES
@@ -25,14 +25,12 @@ export function ChatPreview() {
 
         {/* AI answer */}
         <div className="flex gap-3">
-          <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-md bg-primary/10">
+          {/* <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-md bg-primary/10">
             <Sparkles className="size-4 text-primary" />
-          </span>
+          </span> */}
           <div className="min-w-0 space-y-3">
             <p className="text-sm leading-relaxed text-foreground">
-              Yes — course withdrawal is permitted up to the university&apos;s specified deadline,
-              subject to approval. After midterms it is still possible within the withdrawal window
-              defined in the academic regulations.
+              Yes. You can withdraw from a course after midterms up until the official pre-finals withdrawal deadline. A grade of W will be assigned on your transcript, which has no effect on your GPA.
             </p>
             {/* <SourceCard
               source={{
