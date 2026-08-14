@@ -1,9 +1,74 @@
+'use client'
+
+import { Suspense, useEffect, useState } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, ShieldCheck, Mail, Lock } from 'lucide-react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { ArrowLeft, Lock, Mail, ShieldCheck } from 'lucide-react'
 import { FastLogo } from '@/components/fast-logo'
 import { Button } from '@/components/ui/button'
+import { supabase } from '@/lib/supabase'
 
 export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
+  )
+}
+
+function LoginForm() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const authError = searchParams.get('error')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [mode, setMode] = useState<'signin' | 'signup'>('signin')
+  const [message, setMessage] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) router.replace('/chat')
+    })
+  }, [router])
+
+  async function handleEmailAuth(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    setLoading(true)
+    setMessage('')
+
+    const authCall =
+      mode === 'signin'
+        ? supabase.auth.signInWithPassword({ email, password })
+        : supabase.auth.signUp({ email, password })
+
+    const { error } = await authCall
+    setLoading(false)
+
+    if (error) {
+      setMessage(error.message)
+      return
+    }
+
+    router.replace('/chat')
+  }
+
+  async function handleGoogleAuth() {
+    setLoading(true)
+    setMessage('')
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    })
+
+    if (error) {
+      setLoading(false)
+      setMessage(error.message)
+    }
+  }
+
   return (
     <div className="flex min-h-dvh flex-col bg-background">
       <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-5 sm:px-6">
@@ -24,14 +89,29 @@ export default function LoginPage() {
           <div className="text-center">
             <h1 className="text-2xl font-bold tracking-tight text-foreground">Welcome back</h1>
             <p className="mt-2 text-sm text-muted-foreground text-pretty">
-              Sign in with your FAST university account.
+              Sign in or create an account with any email.
             </p>
           </div>
 
-          <form className="mt-8 space-y-4">
+          <div className="mt-6 grid grid-cols-2 rounded-lg border border-border bg-card p-1">
+            {(['signin', 'signup'] as const).map((item) => (
+              <button
+                key={item}
+                type="button"
+                onClick={() => setMode(item)}
+                className={`h-9 rounded-md text-sm font-medium ${
+                  mode === item ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'
+                }`}
+              >
+                {item === 'signin' ? 'Sign in' : 'Sign up'}
+              </button>
+            ))}
+          </div>
+
+          <form className="mt-6 space-y-4" onSubmit={handleEmailAuth}>
             <div className="space-y-1.5">
               <label htmlFor="email" className="text-sm font-medium text-foreground">
-                University Email
+                Email
               </label>
               <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 focus-within:border-primary/40">
                 <Mail className="size-4 text-muted-foreground" />
@@ -39,8 +119,11 @@ export default function LoginPage() {
                   id="email"
                   type="email"
                   autoComplete="email"
-                  placeholder="k230000@nu.edu.pk"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  placeholder="you@example.com"
                   className="h-11 flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+                  required
                 />
               </div>
             </div>
@@ -54,20 +137,23 @@ export default function LoginPage() {
                 <input
                   id="password"
                   type="password"
-                  autoComplete="current-password"
-                  placeholder="••••••••"
+                  autoComplete={mode === 'signin' ? 'current-password' : 'new-password'}
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  placeholder="At least 6 characters"
                   className="h-11 flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+                  required
+                  minLength={6}
                 />
               </div>
             </div>
 
-            <Button
-              size="lg"
-              className="h-11 w-full text-[15px]"
-              nativeButton={false}
-              render={<Link href="/chat" />}
-            >
-              Sign in
+            {(message || authError) && (
+              <p className="text-sm text-destructive">{message || authError}</p>
+            )}
+
+            <Button size="lg" className="h-11 w-full text-[15px]" type="submit" disabled={loading}>
+              {loading ? 'Please wait...' : mode === 'signin' ? 'Sign in' : 'Create account'}
             </Button>
           </form>
 
@@ -81,8 +167,9 @@ export default function LoginPage() {
             variant="outline"
             size="lg"
             className="h-11 w-full text-[15px]"
-            nativeButton={false}
-            render={<Link href="/chat" />}
+            type="button"
+            onClick={handleGoogleAuth}
+            disabled={loading}
           >
             <GoogleMark />
             Continue with Google
@@ -90,7 +177,7 @@ export default function LoginPage() {
 
           <p className="mt-6 flex items-center justify-center gap-1.5 text-xs text-success">
             <ShieldCheck className="size-3.5" />
-            FAST student verification
+            Authenticated chat history
           </p>
         </div>
       </main>
