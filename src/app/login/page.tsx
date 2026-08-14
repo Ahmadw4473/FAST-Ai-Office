@@ -175,10 +175,7 @@ function LoginForm() {
             Continue with Google
           </Button>
 
-          <p className="mt-6 flex items-center justify-center gap-1.5 text-xs text-success">
-            <ShieldCheck className="size-3.5" />
-            Authenticated chat history
-          </p>
+          
         </div>
       </main>
     </div>

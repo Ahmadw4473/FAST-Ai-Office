@@ -18,7 +18,6 @@ function AuthCallback() {
 
   useEffect(() => {
     async function finishSignIn() {
-      const code = searchParams.get('code')
       const error = searchParams.get('error_description') || searchParams.get('error')
 
       if (error) {
@@ -26,20 +25,20 @@ function AuthCallback() {
         return
       }
 
-      if (code) {
-        const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code)
+      for (let attempt = 0; attempt < 10; attempt += 1) {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession()
 
-        if (exchangeError) {
-          router.replace(`/login?error=${encodeURIComponent(exchangeError.message)}`)
+        if (session) {
+          router.replace('/chat')
           return
         }
+
+        await new Promise((resolve) => setTimeout(resolve, 300))
       }
 
-      const {
-        data: { session },
-      } = await supabase.auth.getSession()
-
-      router.replace(session ? '/chat' : '/login?error=No session was created after Google sign-in')
+      router.replace('/login?error=No session was created after Google sign-in')
     }
 
     finishSignIn()

@@ -86,12 +86,12 @@ export function ChatSidebar({
                       : 'text-sidebar-foreground/80 hover:bg-sidebar-accent/60 hover:text-white',
                   )}
                 >
-                  <MessageSquare
+                  {/* <MessageSquare
                     className={cn(
                       'mt-0.5 size-4 shrink-0',
                       isActive ? 'text-primary' : 'text-sidebar-foreground/40',
                     )}
-                  />
+                  /> */}
                   {isEditing ? (
                     <div className="min-w-0 flex-1">
                       <input
@@ -151,10 +151,10 @@ export function ChatSidebar({
           </span>
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-medium text-white">{userEmail || 'FAST-NUCES'}</p>
-            <p className="flex items-center gap-1 text-xs text-success">
+            {/* <p className="flex items-center gap-1 text-xs text-success">
               <ShieldCheck className="size-3" />
               Authenticated
-            </p>
+            </p> */}
           </div>
           <button type="button" onClick={onSignOut} aria-label="Sign out">
             <LogOut className="size-4 text-sidebar-foreground/50 hover:text-white" />
